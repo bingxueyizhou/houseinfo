@@ -56,3 +56,17 @@ docs/_build/
 
 # PyBuilder
 target/
+
+\.idea/
+
+config/email\.json
+
+tmp_rar/
+
+*.rar
+
+info
+
+download
+
+crawler/

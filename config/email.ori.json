@@ -1,0 +1,9 @@
+{
+  "debug":1,
+  "sender":[
+    {"email":"__modify__", "pwd":"__modify__", "smtp":"__modify__"}
+  ],
+  "receiver":[
+    {"name":"__modify__", "email":"__modify__"}
+  ]
+}
