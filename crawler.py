@@ -9,8 +9,11 @@ import multiprocessing
 import signal
 import re
 import json
+from config import CONF
 
 # print sys.getdefaultencoding()
+
+app_conf   = CONF.load_cfg()
 
 # 主要的URL
 HOUSE_URL = 'https://www.cdfangxie.com/Infor/type/typeid/36.html'
@@ -170,7 +173,7 @@ class CrawlerHouse(object):
             __list.append(cell)
         return __list
 
-    def get_page_details_from_url(self, url):
+    def get_page_details_from_url_version_2018_11_15(self, url):
         file_link = None
         response = self.request_web(url)
         self.save_ori_html(response)
@@ -181,8 +184,19 @@ class CrawlerHouse(object):
             return {"link":"","date":""}
         return {"link":file_link[0],"date":date[0]}
 
+    def get_page_details_from_url(self, url):
+        file_link = None
+        response = self.request_web(url)
+        if app_conf['debug']:
+            self.save_ori_html(response)
+        # tmp_str = re.findall(u"href=\".*?\" target=\"_blank\">购房登记规则及房源表点击下载",response.text);
+        date      = re.findall(u"(?:<span>上市时间</span>:)([0-9]{4}-[0-9]{2}-[0-9]{2})(?:</span>)", response.text)
+        if len(date) == 0:
+            return {"date":""}
+        return {"date":date[0]}
+
 
 if __name__ == '__main__':
     house = CrawlerHouse()
-    house.get_page_details_from_url("https://www.cdfangxie.com/Infor/index/id/4314.html")
+    print(house.get_page_details_from_url("https://www.cdfangxie.com/Infor/index/id/4989.html"))
     #house.moving();

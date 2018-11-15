@@ -19,7 +19,7 @@ class CONF(object):
           ]
     """
     @staticmethod
-    def load_email_cfg():
+    def load_cfg():
         config = dict()
         config['sender'] = []
         config['is_debug'] = True

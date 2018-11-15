@@ -1,5 +1,6 @@
 {
-  "debug":1,
+  "debug":0,
+  "scan_interval":3600,
   "sender":[
     {"email":"__modify__", "pwd":"__modify__", "smtp":"__modify__"}
   ],

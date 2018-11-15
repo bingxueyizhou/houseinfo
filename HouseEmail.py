@@ -8,7 +8,7 @@ from config import CONF
 
 def send_house_info(data):
     receivers = []
-    conf = CONF.load_email_cfg()
+    conf = CONF.load_cfg()
     if conf["debug"]:
         print("debug email: \n"+data)
         return True

@@ -2,24 +2,27 @@
 from schedule import Schedule
 from crawler  import CrawlerHouse
 from HouseEmail import send_house_info
+from config import CONF
+
 import time
+import sys
 
 cd_crawler = CrawlerHouse()
-
+app_conf   = CONF.load_cfg()
 
 def on_find_new(house_list):
     content = "新数据: %d 条记录" % len(house_list)
     print(content)
 
     for l in house_list:
-        # print l['url']
+        if (app_conf['debug']):
+            print("on_find_new", sys._getframe().f_lineno , l)
         details = cd_crawler.get_page_details_from_url(l['url'])
+        if (app_conf['debug']):
+            print("on_find_new", sys._getframe().f_lineno , details)
         time.sleep(1)
-        content += "\n #######################################"
-        content += "\n "+l['title']
-        content += "\n "+details['date']
-        content += "\n "+details['link']
-        content += "\n "
+        content += "\n "+l['title']+"|"+details['date']
+        # content += "\n "+details['link']
         content += "\n "
     # print content
     send_house_info(content)
