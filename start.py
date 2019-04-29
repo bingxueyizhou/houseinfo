@@ -8,7 +8,7 @@ import time
 import sys
 
 cd_crawler = CrawlerHouse()
-app_conf   = CONF.load_cfg()
+app_conf   = CONF.load_email_cfg()
 
 def on_find_new(house_list):
     content = "新数据: %d 条记录" % len(house_list)

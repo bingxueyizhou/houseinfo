@@ -60,6 +60,7 @@ target/
 \.idea/
 
 config/email\.json
+config/server_channel\.json
 
 tmp_rar/
 
@@ -72,5 +73,7 @@ download
 crawler/
 
 .gitignore
+
+
 
 

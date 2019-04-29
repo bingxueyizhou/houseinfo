@@ -13,7 +13,7 @@ from config import CONF
 
 # print sys.getdefaultencoding()
 
-app_conf   = CONF.load_cfg()
+app_conf   = CONF.load_email_cfg()
 
 # 主要的URL
 HOUSE_URL = 'https://www.cdfangxie.com/Infor/type/typeid/36.html'
