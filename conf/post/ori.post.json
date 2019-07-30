@@ -1,0 +1,18 @@
+{
+    "debug":1,
+    "protocol":[
+        {
+            "name": "svchannel",
+            "keys": ["__modify__"]
+        },
+        {
+            "name": "email",
+            "sender":[
+                {"email":"__modify__", "pwd":"__modify__", "smtp":"__modify__"}
+              ],
+              "receiver":[
+                {"name":"__modify__", "email":"__modify__"}
+              ]
+        }
+    ]
+}
