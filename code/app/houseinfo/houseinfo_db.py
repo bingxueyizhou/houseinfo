@@ -5,7 +5,7 @@ import os
 import sys
 APP_PRO_HOME = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.abspath(APP_PRO_HOME + ".."))
-from code.comm.v2log import applog
+from code.comm.v2log import v2info
 # end  引入日志模块
 
 class HouseInfoDB:
@@ -38,6 +38,10 @@ class HouseInfoDB:
     SQL_INSERT_HOUSE_DETAILS_TABLE = "INSERT INTO `HOUSE_DETAILS` (HSID, MARKETING) VALUES('%s', '%s') ;"
     SQL_QUERY_HOUSE_DETAILS_TABLE = "SELECT * FROM `HOUSE_DETAILS` WHERE HSID=%s"
 
+    # 查询所有
+    SQL_QUERY_ALL_HOUSE_INFO = "select * from HOUSE_INFO left outer join HOUSE_DETAILS "\
+                                "on HOUSE_INFO.HSID = HOUSE_DETAILS.HSID;"
+
     def touch(self, path):
         with open(path, 'a'):
             os.utime(path, None)
@@ -59,7 +63,7 @@ class HouseInfoDB:
             break
         if is_exist == False:
             self.conn.execute(create_sql)
-            applog.info("create table %s" % table_name)
+            v2info.info("create table %s" % table_name)
 
     def create_db_table(self):
         self.conn.execute(self.SQL_CREATE_HOUSE_INFO_TABLE)
@@ -76,11 +80,11 @@ class HouseInfoDB:
         if self.conn is None:
             self.conn = sqlite3.connect(self.HOUSE_INFO_DB_PATH)
         if self.conn is None:
-            applog.warn("opened house info database failed.")
+            v2info.warn("opened house info database failed.")
         else:
             self.conn.cursor()
             self.create_db_table()
-            applog.info("opened house info database successfully.")
+            v2info.info("opened house info database successfully.")
 
     # ID TITLE ZONE NAME EXTRA URL DATE
     def add_house_info(self, hsid, title, zone, name, extra, url):
@@ -121,12 +125,25 @@ class HouseInfoDB:
                 return ret
         return None
 
+    def query_all_house_info(self):
+        sql_res = self.conn.execute(self.SQL_QUERY_ALL_HOUSE_INFO)
+        result = []
+        for row in sql_res:
+            cell = dict()
+            cell['id'] = row[0]
+            cell['hsid'] = row[1]
+            cell['title'] = row[2]
+            cell['zone'] = row[3]
+            cell['name'] = row[4]
+            cell['extra'] = row[5]
+            cell['marketing'] = row[10]
+            cell['url'] = row[6]
+            cell['in_time'] = row[7]
+            result.append(cell)
+        return result
 
 if __name__ == "__main__":
     db = HouseInfoDB()
-    db.add_house_info("123", "name", "", "", "", "")
-    print(db.query_house_info("123"))
-    house_info = db.query_house_info("123")
-    db.add_house_details(house_info["hsid"], "2019-08-02")
-    print(db.query_house_details(house_info["hsid"]))
-
+    ret = db.query_all_house_info()
+    for cell in ret:
+        print(cell)
