@@ -1,7 +1,6 @@
 import time
 import threading
 
-
 class ScheduleTask(object):
     MODE_TIMES  = 1
     MODE_SINGLE = 2

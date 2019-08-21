@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 import sqlite3
 import os
-
+# start 引入日志模块
+import sys
+APP_PRO_HOME = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.abspath(APP_PRO_HOME + ".."))
+from code.comm.v2log import applog
+# end  引入日志模块
 
 class HouseInfoDB:
     HOUSE_INFO_DB_HOME = os.path.dirname( os.path.realpath(__file__) )
@@ -54,7 +59,7 @@ class HouseInfoDB:
             break
         if is_exist == False:
             self.conn.execute(create_sql)
-            print("create table %s"%table_name)
+            applog.info("create table %s" % table_name)
 
     def create_db_table(self):
         self.conn.execute(self.SQL_CREATE_HOUSE_INFO_TABLE)
@@ -71,11 +76,11 @@ class HouseInfoDB:
         if self.conn is None:
             self.conn = sqlite3.connect(self.HOUSE_INFO_DB_PATH)
         if self.conn is None:
-            print("opened house info database failed.")
+            applog.warn("opened house info database failed.")
         else:
             self.conn.cursor()
             self.create_db_table()
-            print("opened house info database successfully.")
+            applog.info("opened house info database successfully.")
 
     # ID TITLE ZONE NAME EXTRA URL DATE
     def add_house_info(self, hsid, title, zone, name, extra, url):

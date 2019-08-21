@@ -3,12 +3,13 @@ import sys
 import os
 import time
 sys.path.append(os.path.abspath("./code"))
-print(sys.path)
 
 from code.app.houseinfo.schedule import Schedule
 from code.app.houseinfo.houseinfo_crawler import CrawlerHouse
-from code.api.api_post import send_email
 from code.api.api_post import send_svchannel
+
+# 引入日志模块
+from code.comm.v2log import applog
 
 
 cd_crawler = CrawlerHouse()
@@ -23,30 +24,31 @@ def on_find_new(house_list):
         content += "\n "+l['title']+"|"+details['date']
         # content += "\n "+details['link']
         content += "\n "
-    # print content
-    send_email(content, "成都房协信息")
-    send_svchannel(content, "成都房协信息")
+    applog.debug(content)
+    if (0 != len(house_list)):
+        # send_email(content, "成都房协信息(%s)" % (len(house_list)))
+        send_svchannel(content, "成都房协信息(%s)" % (len(house_list)))
     return
 
 
 def crawler_cd_house_data(pridata):
-    print("["+time.asctime()+"] 首页刷新中")
+    applog.info("["+time.asctime()+"] 首页刷新中")
     cd_crawler.moving(on_find_new)
     return
 
 
 def ocr_pictures(files):
-    print("图形转化中")
+    applog.info("图形转化中")
     return
 
 
 def analyze_data(data):
-    print("分析数据中")
+    applog.info("分析数据中")
     return
 
 
 def push_msg(data):
-    print("发送消息:"+data)
+    applog.info("发送消息:"+data)
     return
 
 

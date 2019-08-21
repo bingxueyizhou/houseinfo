@@ -1,15 +1,16 @@
 # -*- coding:utf-8 -*-
 import requests
 import time
-import subprocess
-import os
-import codecs
-import sys
-import multiprocessing
-import signal
 import re
-import json
 from .houseinfo_db import HouseInfoDB
+
+# start 引入日志模块
+import sys
+import os
+APP_PRO_HOME = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.abspath(APP_PRO_HOME + ".."))
+from code.comm.v2log import applog
+# end  引入日志模块
 
 # print sys.getdefaultencoding()
 app_conf = dict()
@@ -124,7 +125,7 @@ class CrawlerHouse(object):
 
         for info in self.infolist:
             query_ret = self.db.query_house_info(info["hsid"])
-            print(query_ret)
+            applog.info(query_ret)
             if query_ret is not None:
                 time.sleep(1)
                 details = self.get_page_details_from_url(query_ret["url"])
@@ -146,8 +147,8 @@ class CrawlerHouse(object):
             return requests.get(url, headers = self.header)
         except Exception as e:
             response = None
-            print(e)
-            print("network error.")
+            applog.warn(e)
+            applog.warn("network error.")
         return response
 
     def __list_diff(self, old, new):
