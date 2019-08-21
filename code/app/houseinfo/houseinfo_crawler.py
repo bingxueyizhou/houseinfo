@@ -2,15 +2,9 @@
 import requests
 import time
 import re
-from .houseinfo_db import HouseInfoDB
-
-# start 引入日志模块
-import sys
 import os
-APP_PRO_HOME = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.abspath(APP_PRO_HOME + ".."))
+from houseinfo_db import HouseInfoDB
 from code.comm.v2log import v2info
-# end  引入日志模块
 
 # print sys.getdefaultencoding()
 app_conf = dict()

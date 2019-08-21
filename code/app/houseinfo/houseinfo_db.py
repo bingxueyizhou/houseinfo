@@ -1,12 +1,9 @@
 #!/usr/bin/python3
 import sqlite3
 import os
-# start 引入日志模块
-import sys
-APP_PRO_HOME = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.abspath(APP_PRO_HOME + ".."))
+
+import project
 from code.comm.v2log import v2info
-# end  引入日志模块
 
 class HouseInfoDB:
     HOUSE_INFO_DB_HOME = os.path.dirname( os.path.realpath(__file__) )
@@ -59,7 +56,7 @@ class HouseInfoDB:
         is_exist = False
         for row in res:
             if row[0] is table_name:
-                is_exist = True;
+                is_exist = True
             break
         if is_exist == False:
             self.conn.execute(create_sql)

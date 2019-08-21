@@ -1,8 +1,6 @@
 # -*- coding:utf-8 -*-
-import sys
-import os
+import project
 import time
-sys.path.append(os.path.abspath("./code"))
 
 from code.app.houseinfo.schedule import Schedule
 from code.app.houseinfo.houseinfo_crawler import CrawlerHouse
