@@ -95,9 +95,9 @@ class GzTimedRotatingFileHandler(handlers.TimedRotatingFileHandler):
 
 
 
-global v2info
+global v2log
 logging.root.setLevel(logging.NOTSET)  # cancel Logger's level, standard to handler
-v2info = logging.getLogger(__name__)
+v2log = logging.getLogger(__name__)
 
 # 文件夹与创建
 log_file = "./log/app.log"
@@ -111,6 +111,6 @@ formatter = logging.Formatter("[%(asctime)s][%(levelname)s][%(filename)s %(funcN
 fh = GzTimedRotatingFileHandler(filename=log_file, when="MIDNIGHT", interval=1)
 fh.setFormatter(formatter)
 fh.setLevel("INFO")
-v2info.addHandler(fh)
+v2log.addHandler(fh)
 
 # applog.handlers.pop()

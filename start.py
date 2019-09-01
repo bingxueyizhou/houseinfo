@@ -7,7 +7,7 @@ from code.app.houseinfo.houseinfo_crawler import CrawlerHouse
 from code.api.api_post import send_svchannel
 
 # 引入日志模块
-from code.comm.v2log import v2info
+from code.comm.v2log import v2log
 
 
 cd_crawler = CrawlerHouse()
@@ -22,7 +22,7 @@ def on_find_new(house_list):
         content += "\n "+l['title']+"|"+details['date']
         # content += "\n "+details['link']
         content += "\n "
-    v2info.debug(content)
+    v2log.debug(content)
     if (0 != len(house_list)):
         # send_email(content, "成都房协信息(%s)" % (len(house_list)))
         send_svchannel(content, "成都房协信息(%s)" % (len(house_list)))
@@ -30,23 +30,23 @@ def on_find_new(house_list):
 
 
 def crawler_cd_house_data(pridata):
-    v2info.info("[" + time.asctime() + "] 首页刷新中")
+    v2log.info("[" + time.asctime() + "] 首页刷新中")
     cd_crawler.moving(on_find_new)
     return
 
 
 def ocr_pictures(files):
-    v2info.info("图形转化中")
+    v2log.info("图形转化中")
     return
 
 
 def analyze_data(data):
-    v2info.info("分析数据中")
+    v2log.info("分析数据中")
     return
 
 
 def push_msg(data):
-    v2info.info("发送消息:" + data)
+    v2log.info("发送消息:" + data)
     return
 
 

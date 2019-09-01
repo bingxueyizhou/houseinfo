@@ -3,7 +3,7 @@ import sqlite3
 import os
 
 import project
-from code.comm.v2log import v2info
+from code.comm.v2log import v2log
 
 class HouseInfoDB:
     HOUSE_INFO_DB_HOME = os.path.dirname( os.path.realpath(__file__) )
@@ -60,7 +60,7 @@ class HouseInfoDB:
             break
         if is_exist == False:
             self.conn.execute(create_sql)
-            v2info.info("create table %s" % table_name)
+            v2log.info("create table %s" % table_name)
 
     def create_db_table(self):
         self.conn.execute(self.SQL_CREATE_HOUSE_INFO_TABLE)
@@ -77,11 +77,11 @@ class HouseInfoDB:
         if self.conn is None:
             self.conn = sqlite3.connect(self.HOUSE_INFO_DB_PATH)
         if self.conn is None:
-            v2info.warn("opened house info database failed.")
+            v2log.warn("opened house info database failed.")
         else:
             self.conn.cursor()
             self.create_db_table()
-            v2info.info("opened house info database successfully.")
+            v2log.info("opened house info database successfully.")
 
     # ID TITLE ZONE NAME EXTRA URL DATE
     def add_house_info(self, hsid, title, zone, name, extra, url):

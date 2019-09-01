@@ -3,8 +3,8 @@ import requests
 import time
 import re
 import os
-from houseinfo_db import HouseInfoDB
-from code.comm.v2log import v2info
+from .houseinfo_db import HouseInfoDB
+from code.comm.v2log import v2log
 
 # print sys.getdefaultencoding()
 app_conf = dict()
@@ -119,7 +119,7 @@ class CrawlerHouse(object):
 
         for info in self.infolist:
             query_ret = self.db.query_house_info(info["hsid"])
-            v2info.info(query_ret)
+            v2log.info(query_ret)
             if query_ret is not None:
                 time.sleep(1)
                 details = self.get_page_details_from_url(query_ret["url"])
@@ -141,8 +141,8 @@ class CrawlerHouse(object):
             return requests.get(url, headers = self.header)
         except Exception as e:
             response = None
-            v2info.warn(e)
-            v2info.warn("network error.")
+            v2log.warn(e)
+            v2log.warn("network error.")
         return response
 
     def __list_diff(self, old, new):
