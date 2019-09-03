@@ -20,31 +20,27 @@ def init_logger():
     global v2log
     v2log = None
 
-
 def set_logger(path):
     global v2log
     v2log = init_v2log(path)
 
-
 def get_logger():
     global v2log
     return v2log
-
 
 ## config
 def init_config():
     global v2conf
     v2conf = None
 
-
 def set_config(path):
     global v2conf
     v2conf = init_v2conf(path)
 
-
 def get_config():
     global v2conf
     return v2conf
+
 
 
 ## path
@@ -54,6 +50,9 @@ def get_app_path():
 
 def get_app_data_path():
     return APP_DATA_HOME
+
+def get_app_config_path():
+    return APP_DATA_HOME+"/conf"
 
 
 def app_init(path=None):

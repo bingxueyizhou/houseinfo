@@ -30,7 +30,7 @@ def main():
         # ...统计计算相关信息
         # ...推送相关信息，邮件
     schedule = Schedule()
-    schedule.do(pri_data="HouseInfo", cb=houseinfo_run, name="HouseInfo", interval=10)
+    schedule.do(pri_data="HouseInfo", cb=houseinfo_run, name="HouseInfo", interval=3600)
     return
 
 

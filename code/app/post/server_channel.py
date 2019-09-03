@@ -2,7 +2,7 @@
 
 import requests
 import json
-from conf.config_loader import CONF
+from code.app.post.conf.config_loader import CONF
 
 import code.app.post.app_project as app_post
 global v2log
@@ -11,7 +11,8 @@ SERVER_CHANNEL_URL = "https://sc.ftqq.com/"
 
 def send_server_channel(title= "", content = None):
     v2log = app_post.get_logger()
-    conf = CONF.load_post_cfg()
+    print(app_post.get_app_config_path())
+    conf = CONF.load_post_cfg(app_post.get_app_config_path()+"/post.json")
     if conf["debug"]:
         if content:
             v2log.info("[svchannel]debug title: " + title + "\ncontent:\n" + content)
