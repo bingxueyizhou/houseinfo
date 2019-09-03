@@ -4,17 +4,13 @@ import requests
 import json
 from conf.config_loader import CONF
 
-# start 引入日志模块
-import sys
-import os
-APP_PRO_HOME = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.abspath(APP_PRO_HOME + ".."))
-from code.comm.v2log import v2log
-# end  引入日志模块
+import code.app.post.app_project as app_post
+global v2log
 
 SERVER_CHANNEL_URL = "https://sc.ftqq.com/"
 
 def send_server_channel(title= "", content = None):
+    v2log = app_post.get_logger()
     conf = CONF.load_post_cfg()
     if conf["debug"]:
         if content:

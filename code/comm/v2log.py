@@ -94,23 +94,27 @@ class GzTimedRotatingFileHandler(handlers.TimedRotatingFileHandler):
         self.rolloverAt = newRolloverAt
 
 
+def init_v2log(path=None):
+    logging.root.setLevel(logging.NOTSET)  # cancel Logger's level, standard to handler
+    v2log = logging.getLogger(__name__)
 
-global v2log
-logging.root.setLevel(logging.NOTSET)  # cancel Logger's level, standard to handler
-v2log = logging.getLogger(__name__)
+    # 文件夹与创建
+    log_file = "./log/app.log"
+    if path is not None:
+        log_file = path
+    log_path_dir = os.path.dirname(log_file)
+    if not os.path.exists(log_path_dir):
+        os.makedirs(log_path_dir)
 
-# 文件夹与创建
-log_file = "./log/app.log"
-log_path_dir = os.path.dirname(log_file)
-if not os.path.exists(log_path_dir):
-    os.makedirs(log_path_dir)
+    formatter = logging.Formatter(
+        "[%(asctime)s][%(levelname)s][%(filename)s %(funcName)s: %(lineno)s] %(message)s")  # 定义输出格式
+
+    fh = GzTimedRotatingFileHandler(filename=log_file, when="MIDNIGHT", interval=1)
+    fh.setFormatter(formatter)
+    fh.setLevel("INFO")
+    v2log.addHandler(fh)
+    return v2log
 
 
-formatter = logging.Formatter("[%(asctime)s][%(levelname)s][%(filename)s %(funcName)s: %(lineno)s] %(message)s")  #定义输出格式
-
-fh = GzTimedRotatingFileHandler(filename=log_file, when="MIDNIGHT", interval=1)
-fh.setFormatter(formatter)
-fh.setLevel("INFO")
-v2log.addHandler(fh)
 
 # applog.handlers.pop()

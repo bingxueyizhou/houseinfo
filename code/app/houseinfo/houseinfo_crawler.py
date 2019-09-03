@@ -3,8 +3,10 @@ import requests
 import time
 import re
 import os
-from .houseinfo_db import HouseInfoDB
-from code.comm.v2log import v2log
+
+import code.app.houseinfo.app_project as app_project
+from code.app.houseinfo.houseinfo_db import HouseInfoDB
+v2log = None
 
 # print sys.getdefaultencoding()
 app_conf = dict()
@@ -74,26 +76,32 @@ class CrawlerHouse(object):
     CRAWLER_HOUSE_HOME = os.path.dirname( os.path.realpath(__file__) )
     is_debug = True
 
-    def __init__(self):
+    def __init__(self, path=None):
         self.home = HOUSE_URL
         self.time = REFRESH_TIME * 59 # 秒 -> 分鍾
         self.response = None
         self.current_json = dict()
         self.header = {'Connection': 'close'}
         self.infolist = []
-        self.filedir  = self.CRAWLER_HOUSE_HOME+'/crawler'
-        self.init_dir()
+
+        if path is not None:
+            self.CRAWLER_HOUSE_HOME = path
+        self.datadir  = self.CRAWLER_HOUSE_HOME + '/data/crawler'
+        self.init_datadir()
         self.init_db()
+
+        global v2log
+        v2log = app_project.get_logger()
 
 
     # file operation
-    def init_dir(self):
-        if not os.path.isdir(self.filedir):
-            os.makedirs(self.filedir)
+    def init_datadir(self):
+        if not os.path.isdir(self.datadir):
+            os.makedirs(self.datadir)
 
     # db operation
     def init_db(self):
-        self.db = HouseInfoDB()
+        self.db = HouseInfoDB(path=self.CRAWLER_HOUSE_HOME)
 
     def save_ori_html(self, response, filename=CRAWLER_HOUSE_HOME+'/crawler/debug.html'):
         if not self.is_debug : return

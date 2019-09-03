@@ -2,8 +2,8 @@
 import sqlite3
 import os
 
-import project
-from code.comm.v2log import v2log
+import code.app.houseinfo.app_project as app_project
+v2log = None
 
 class HouseInfoDB:
     HOUSE_INFO_DB_HOME = os.path.dirname( os.path.realpath(__file__) )
@@ -70,8 +70,15 @@ class HouseInfoDB:
         self.conn.close()
         self.conn = None
 
-    def __init__(self):
+    def __init__(self, path=None):
+        global v2log
+        v2log = app_project.get_logger()
+
         self.conn = None
+        if path is not None:
+            self.HOUSE_INFO_DB_HOME = path
+        self.HOUSE_INFO_DB_PATH = self.HOUSE_INFO_DB_HOME + "/db/house_info.db"
+
         self.check_dirs()
 
         if self.conn is None:
@@ -82,6 +89,7 @@ class HouseInfoDB:
             self.conn.cursor()
             self.create_db_table()
             v2log.info("opened house info database successfully.")
+
 
     # ID TITLE ZONE NAME EXTRA URL DATE
     def add_house_info(self, hsid, title, zone, name, extra, url):
