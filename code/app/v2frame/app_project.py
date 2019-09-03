@@ -62,11 +62,12 @@ def get_windows_path():
     path = os.path.dirname(os.environ["USERPROFILE"]+"/")
     return path + "/v2info"
 
+
 def get_default_path():
     sys_type = get_system_type()
-    if sys_type is "Windows":
+    if sys_type == "Windows":
         return get_windows_path()
-    if sys_type is "Linux":
+    if sys_type == "Linux":
         return get_linux_path()
     return None
 
