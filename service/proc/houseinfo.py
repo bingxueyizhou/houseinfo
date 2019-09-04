@@ -15,7 +15,7 @@ cd_crawler = CrawlerHouse(app_houseinfo.get_app_data_path())
 
 def on_find_new(house_list):
     content = "新数据: %d 条记录" % len(house_list)
-    print(content)
+    v2log.info(content)
 
     for l in house_list:
         details = cd_crawler.get_page_details_from_url(l['url'])
