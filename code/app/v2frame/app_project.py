@@ -85,7 +85,6 @@ def app_init(path=None):
 
     if path is not None:
         APP_PRO_HOME = path
-    print(APP_PRO_HOME)
     APP_DATA_HOME = APP_PRO_HOME + "/user_data"
     init_logger()
     set_logger(APP_DATA_HOME + "/log/v2info.log")

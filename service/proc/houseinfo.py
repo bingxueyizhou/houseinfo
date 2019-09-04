@@ -9,7 +9,6 @@ from code.app.post.server_channel import send_server_channel as send_svchannel
 import code.app.v2frame.app_project as v2frame
 import code.app.houseinfo.app_project as app_houseinfo
 
-v2frame.app_init()
 v2log = v2frame.get_logger()
 
 cd_crawler = CrawlerHouse(app_houseinfo.get_app_data_path())
