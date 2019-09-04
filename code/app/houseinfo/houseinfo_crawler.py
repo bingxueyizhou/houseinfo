@@ -75,6 +75,7 @@ class HouseCell(dict):
 class CrawlerHouse(object):
     CRAWLER_HOUSE_HOME = os.path.dirname( os.path.realpath(__file__) )
     is_debug = True
+    db = None
 
     def __init__(self, path=None):
         self.home = HOUSE_URL
@@ -100,7 +101,8 @@ class CrawlerHouse(object):
 
     # db operation
     def init_db(self):
-        self.db = HouseInfoDB(path=self.CRAWLER_HOUSE_HOME)
+        if self.db is None:
+            self.db = HouseInfoDB(path=self.CRAWLER_HOUSE_HOME)
 
     def save_ori_html(self, response, filename=CRAWLER_HOUSE_HOME+'/crawler/debug.html'):
         if not self.is_debug : return
@@ -119,6 +121,7 @@ class CrawlerHouse(object):
         response = self.request_web(self.home)
         home_list = self.home_page_to_list(response)
 
+        v2log.info("web get: %s"%home_list)
         for info in home_list:
             query_ret = self.db.query_house_info(info["hsid"])
             if query_ret is None:
@@ -127,14 +130,16 @@ class CrawlerHouse(object):
 
         for info in infolist:
             query_ret = self.db.query_house_info(info["hsid"])
-            v2log.info(query_ret)
+            v2log.info("query house id=%s, ret=%s"%(info["hsid"], query_ret) )
             if query_ret is not None:
-                time.sleep(1)
+                time.sleep(2)
                 query_details_ret = self.db.query_house_details(info["hsid"])
                 if query_details_ret is None:
                     details = self.get_page_details_from_url(query_ret["url"])
                     if details is None:
                         continue
+
+                    v2log.info("update house id=%s, details=%s" % (info["hsid"], query_ret))
                     self.db.add_house_details(info["hsid"], details["date"])
 
 

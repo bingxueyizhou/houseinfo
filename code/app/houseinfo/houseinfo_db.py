@@ -16,21 +16,21 @@ class HouseInfoDB:
     SQL_HOUSE_INFO_TABLE_NAME = "HOUSE_INFO"
     SQL_CREATE_HOUSE_INFO_TABLE = "CREATE TABLE IF NOT EXISTS `HOUSE_INFO` (" \
                                   "ID INTEGER PRIMARY KEY AUTOINCREMENT," \
-                                  "HSID NOT NULL," \
+                                  "HSID INTEGER UNIQUE NOT NULL," \
                                   "TITLE TEXT NOT NULL," \
                                   "ZONE TEXT," \
                                   "NAME TEXT," \
                                   "EXTRA TEXT," \
                                   "URL TEXT," \
                                   "IN_TIME TIMESTAMP DEFAULT CURRENT_TIMESTAMP );"
-    SQL_QUERY_HOUSE_INFO_TABLE = "SELECT * FROM `HOUSE_INFO` WHERE HSID='%s';"
+    SQL_QUERY_HOUSE_INFO_TABLE = "SELECT * FROM `HOUSE_INFO` WHERE HSID=%s;"
     SQL_INSERT_HOUSE_INFO_TABLE = "INSERT INTO HOUSE_INFO (HSID, TITLE, ZONE, NAME, EXTRA, URL) " \
                                   "VALUES('%s', '%s', '%s', '%s', '%s', '%s');"
     # 房源详情表
     # ID HSID MARKETING
     SQL_CREATE_HOUSE_DETAILS_TABLE = "CREATE TABLE IF NOT EXISTS `HOUSE_DETAILS` (" \
                                      "ID INTEGER PRIMARY KEY AUTOINCREMENT," \
-                                     "HSID INTEGER NOT NULL," \
+                                     "HSID INTEGER UNIQUE NOT NULL," \
                                      "MARKETING DATE);"
     SQL_INSERT_HOUSE_DETAILS_TABLE = "INSERT INTO `HOUSE_DETAILS` (HSID, MARKETING) VALUES('%s', '%s') ;"
     SQL_QUERY_HOUSE_DETAILS_TABLE = "SELECT * FROM `HOUSE_DETAILS` WHERE HSID=%s"
@@ -93,59 +93,79 @@ class HouseInfoDB:
 
     # ID TITLE ZONE NAME EXTRA URL DATE
     def add_house_info(self, hsid, title, zone, name, extra, url):
-        self.conn.execute(self.SQL_INSERT_HOUSE_INFO_TABLE %
-                          (hsid, title, zone, name, extra, url))
-        self.conn.commit()
+        sql = self.SQL_INSERT_HOUSE_INFO_TABLE % (hsid, title, zone, name, extra, url)
+        try:
+            self.conn.execute(sql)
+            self.conn.commit()
+        except BaseException as e:
+            v2log.warn("sql: %s, except:%s"%(sql, e))
 
     # ID TITLE ZONE NAME EXTRA URL DATE
     def query_house_info(self, hsid):
-        res = self.conn.execute(self.SQL_QUERY_HOUSE_INFO_TABLE % hsid)
-        for row in res:
-            if row[1] == hsid:
-                ret = dict()
-                ret['id'] = row[0]
-                ret['hsid'] = row[1]
-                ret['title'] = row[2]
-                ret['zone'] = row[3]
-                ret['name'] = row[4]
-                ret['extra'] = row[5]
-                ret['url'] = row[6]
-                ret['in_time'] = row[7]
-                return ret
+        sql = self.SQL_QUERY_HOUSE_INFO_TABLE % hsid
+        v2log.debug("sql: %s "%(sql))
+        try:
+            res = self.conn.execute(sql)
+            for row in res:
+                if str(row[1]) == hsid:
+                    ret = dict()
+                    ret['id'] = row[0]
+                    ret['hsid'] = row[1]
+                    ret['title'] = row[2]
+                    ret['zone'] = row[3]
+                    ret['name'] = row[4]
+                    ret['extra'] = row[5]
+                    ret['url'] = row[6]
+                    ret['in_time'] = row[7]
+                    return ret
+        except BaseException as e:
+            v2log.warn("sql: %s, except:%s" % (sql, e))
         return None
 
     def add_house_details(self, hsid, marketing):
-        self.conn.execute(self.SQL_INSERT_HOUSE_DETAILS_TABLE % (hsid, marketing) )
-        self.conn.commit()
+        sql = self.SQL_INSERT_HOUSE_DETAILS_TABLE % (hsid, marketing)
+        try:
+            self.conn.execute(sql)
+            self.conn.commit()
+        except BaseException as e:
+            v2log.warn("sql: %s, except:%s"%(sql, e))
 
     def query_house_details(self, hsid):
-        #print(self.SQL_QUERY_HOUSE_DETAILS_TABLE % hsid )
-        res = self.conn.execute(self.SQL_QUERY_HOUSE_DETAILS_TABLE % hsid)
-        for row in res:
-            if row[1] == hsid:
-                ret = dict()
-                ret['id'] = row[0]
-                ret['hsid'] = row[1]
-                ret['marketing'] = row[2]
-                return ret
+        sql = self.SQL_QUERY_HOUSE_DETAILS_TABLE % hsid
+        try:
+            res = self.conn.execute(sql)
+            for row in res:
+                if str(row[1]) == hsid:
+                    ret = dict()
+                    ret['id'] = row[0]
+                    ret['hsid'] = row[1]
+                    ret['marketing'] = row[2]
+                    return ret
+        except BaseException as e:
+            v2log.warn("sql: %s, except:%s"%(sql, e))
         return None
 
     def query_all_house_info(self):
-        sql_res = self.conn.execute(self.SQL_QUERY_ALL_HOUSE_INFO)
-        result = []
-        for row in sql_res:
-            cell = dict()
-            cell['id'] = row[0]
-            cell['hsid'] = row[1]
-            cell['title'] = row[2]
-            cell['zone'] = row[3]
-            cell['name'] = row[4]
-            cell['extra'] = row[5]
-            cell['marketing'] = row[10]
-            cell['url'] = row[6]
-            cell['in_time'] = row[7]
-            result.append(cell)
-        return result
+        sql = self.SQL_QUERY_ALL_HOUSE_INFO
+        try:
+            sql_res = self.conn.execute(sql)
+            result = []
+            for row in sql_res:
+                cell = dict()
+                cell['id'] = row[0]
+                cell['hsid'] = row[1]
+                cell['title'] = row[2]
+                cell['zone'] = row[3]
+                cell['name'] = row[4]
+                cell['extra'] = row[5]
+                cell['marketing'] = row[10]
+                cell['url'] = row[6]
+                cell['in_time'] = row[7]
+                result.append(cell)
+            return result
+        except BaseException as e:
+            v2log.warn("sql: %s, except:%s"%(sql, e))
+        return None
 
 if __name__ == "__main__":
     db = HouseInfoDB()
