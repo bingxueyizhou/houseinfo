@@ -10,7 +10,7 @@ import code.app.houseinfo.app_project as app_houseinfo
 
 def app_init():
     app_v2frame.app_init()
-    sys_path = app_v2frame.get_project_default_path()
+    sys_path = app_v2frame.get_app_path()
     app_post.app_init(sys_path + "/post")
     app_houseinfo.app_init(sys_path + "/houseinfo")
 

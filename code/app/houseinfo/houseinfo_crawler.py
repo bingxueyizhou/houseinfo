@@ -82,7 +82,6 @@ class CrawlerHouse(object):
         self.response = None
         self.current_json = dict()
         self.header = {'Connection': 'close'}
-        self.infolist = []
 
         if path is not None:
             self.CRAWLER_HOUSE_HOME = path
@@ -116,6 +115,7 @@ class CrawlerHouse(object):
     # logic process
     def moving(self, on_new=None):
         self.init_db()
+        infolist = []
         response = self.request_web(self.home)
         home_list = self.home_page_to_list(response)
 
@@ -123,23 +123,23 @@ class CrawlerHouse(object):
             query_ret = self.db.query_house_info(info["hsid"])
             if query_ret is None:
                 self.db.add_house_info(info["hsid"], info["title"], info["zone"], info["name"], info["extra"], info["url"])
-                self.infolist.append(info)
+                infolist.append(info)
 
-        for info in self.infolist:
+        for info in infolist:
             query_ret = self.db.query_house_info(info["hsid"])
             v2log.info(query_ret)
             if query_ret is not None:
                 time.sleep(1)
-                details = self.get_page_details_from_url(query_ret["url"])
-                if details is None:
-                    continue
                 query_details_ret = self.db.query_house_details(info["hsid"])
                 if query_details_ret is None:
+                    details = self.get_page_details_from_url(query_ret["url"])
+                    if details is None:
+                        continue
                     self.db.add_house_details(info["hsid"], details["date"])
 
 
         if on_new is not None:
-            on_new(self.infolist)
+            on_new(infolist)
 
         self.db.close()
 

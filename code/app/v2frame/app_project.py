@@ -52,33 +52,34 @@ def get_app_path():
 def get_app_data_path():
     return APP_DATA_HOME
 
-def get_system_type():
+
+def __get_system_type():
     return platform.system()
 
-def get_linux_path():
+
+def __get_linux_path():
     return "/var/v2info/"
 
-def get_windows_path():
+
+def __get_windows_path():
     path = os.path.dirname(os.environ["USERPROFILE"]+"/")
     return path + "/v2info"
 
 
-def get_default_path():
-    sys_type = get_system_type()
+def __get_default_path():
+    sys_type = __get_system_type()
     if sys_type == "Windows":
-        return get_windows_path()
+        return __get_windows_path()
     if sys_type == "Linux":
-        return get_linux_path()
+        return __get_linux_path()
     return None
 
-def get_project_default_path():
-    return APP_PRO_HOME
 
 def app_init(path=None):
     global APP_PRO_HOME
     global APP_DATA_HOME
 
-    sys_path = get_default_path()
+    sys_path = __get_default_path()
     if sys_path is not None:
         APP_PRO_HOME = sys_path
 
