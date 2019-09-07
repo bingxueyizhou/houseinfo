@@ -1,9 +1,12 @@
 import sys
 import os
+import sqlite3
 
 global APP_PRO_HOME
 global v2log
 global v2conf
+global v2db
+v2db=None
 
 APP_PRO_HOME  = os.path.dirname(os.path.realpath(__file__))
 APP_DATA_HOME = APP_PRO_HOME + "/user_data"
@@ -44,6 +47,24 @@ def set_config(path):
 def get_config():
     global v2conf
     return v2conf
+
+
+## database
+def init_v2db(path=None):
+    global v2db
+    if path is None:
+        return
+
+    if v2db is not None:
+        return
+
+    v2db = sqlite3.connect(path)
+    v2db.cursor()
+
+
+def get_v2db():
+    global v2db
+    return v2db
 
 
 ## path

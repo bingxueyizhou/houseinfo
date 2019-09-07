@@ -117,34 +117,37 @@ class CrawlerHouse(object):
     # logic process
     def moving(self, on_new=None):
         self.init_db()
-        infolist = []
+        diff_list = []
+        # get info and translate to list
         response = self.request_web(self.home)
         home_list = self.home_page_to_list(response)
 
+        # DB process
         v2log.info("web get: %s"%home_list)
         for info in home_list:
+            # step 1: check if it exists in db. if in, skip.
             query_ret = self.db.query_house_info(info["hsid"])
-            if query_ret is None:
-                self.db.add_house_info(info["hsid"], info["title"], info["zone"], info["name"], info["extra"], info["url"])
-                infolist.append(info)
-
-        for info in infolist:
-            query_ret = self.db.query_house_info(info["hsid"])
-            v2log.info("query house id=%s, ret=%s"%(info["hsid"], query_ret) )
             if query_ret is not None:
-                time.sleep(2)
-                query_details_ret = self.db.query_house_details(info["hsid"])
-                if query_details_ret is None:
-                    details = self.get_page_details_from_url(query_ret["url"])
-                    if details is None:
-                        continue
+                continue
 
-                    v2log.info("update house id=%s, details=%s" % (info["hsid"], query_ret))
-                    self.db.add_house_details(info["hsid"], details["date"])
+            # step 2: if not, add it. And keep different data in array .
+            self.db.add_house_info(info["hsid"], info["title"], info["zone"], info["name"], info["extra"], info["url"])
+            diff_list.append(info)
 
+        for info in diff_list:
+            # step 3: loop difference array to parse details.
+            details = self.get_page_details_from_url(info["url"])
+            if details is None:
+                continue
 
+            v2log.info("update house id=%s, details=%s" % (info["hsid"], query_ret))
+            # step 4: save details to db.
+            self.db.add_house_details(info["hsid"], details["date"], details["area"])
+            time.sleep(2)
+
+        # step 5: callback
         if on_new is not None:
-            on_new(infolist)
+            on_new(diff_list)
 
         self.db.close()
 
@@ -186,7 +189,11 @@ class CrawlerHouse(object):
         date = re.findall(u"(?:<span>上市时间</span>:)([0-9]{4}-[0-9]{2}-[0-9]{2})(?:</span>)", response.text)
         if len(date) == 0:
             return None
-        return {"date":date[0]}
+
+        area = re.findall(u"(?:<span>\):)([0-9\.]+)(?:</span>)", response.text)
+        if len(area) == 0:
+            return None
+        return {"date":date[0], "area":area[0]}
 
 if __name__ == '__main__' :
     house = CrawlerHouse()
