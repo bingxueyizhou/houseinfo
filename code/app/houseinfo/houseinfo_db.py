@@ -99,7 +99,7 @@ class HouseInfoDB:
 
     # outer function
     def close(self):
-        self.__conn = None
+        return
 
     """  ADD  """
     def add_house_info(self, hsid, title, zone, name, extra, url):
