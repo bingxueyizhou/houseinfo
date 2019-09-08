@@ -40,7 +40,7 @@ class HouseInfoDB:
                                      "HSID INTEGER UNIQUE NOT NULL," \
                                      "AREA REAL," \
                                      "MARKETING DATE);"
-    SQL_INSERT_HOUSE_DETAILS_TABLE = "INSERT INTO `HOUSE_DETAILS` (HSID, AREA, MARKETING) VALUES('%s', '%s', '%s') ;"
+    SQL_INSERT_HOUSE_DETAILS_TABLE = "INSERT INTO `HOUSE_DETAILS` (HSID, MARKETING, AREA) VALUES('%s', '%s', '%s') ;"
     SQL_QUERY_HOUSE_DETAILS_TABLE = "SELECT * FROM `HOUSE_DETAILS` WHERE HSID=%s"
 
     # 查询所有

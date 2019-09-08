@@ -151,6 +151,17 @@ class CrawlerHouse(object):
 
         self.db.close()
 
+    # logic process
+    def moving_passed(self, id=None):
+        if id is None:
+            print("id is None")
+            return
+
+        self.home = HOUSE_URL + "?&p=%s" % (id)
+        print("start parse url:%s"%self.home)
+        self.moving()
+
+
     def request_web(self, url):
         response = None
         try:
@@ -194,8 +205,3 @@ class CrawlerHouse(object):
         if len(area) == 0:
             return None
         return {"date":date[0], "area":area[0]}
-
-if __name__ == '__main__' :
-    house = CrawlerHouse()
-    # print(house.get_page_details_from_url("https://www.cdfangxie.com/Infor/index/id/4989.html"))
-    house.moving()
