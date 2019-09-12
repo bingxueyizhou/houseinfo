@@ -104,9 +104,13 @@ class CrawlerHouse(object):
         if self.db is None:
             self.db = HouseInfoDB(path=self.CRAWLER_HOUSE_HOME)
 
-    def save_ori_html(self, response, filename=CRAWLER_HOUSE_HOME+'/crawler/debug.html'):
+    def save_ori_html(self, response, filename=CRAWLER_HOUSE_HOME+'/data/crawler/debug.html'):
         if not self.is_debug : return
         if response == None  : return
+
+        if not os.path.exists(filename):
+            with open(filename, 'a'):
+                os.utime(filename, None)
 
         with open(filename, 'w') as file:
             file.write(str(response.text.encode("utf-8")))
@@ -139,9 +143,10 @@ class CrawlerHouse(object):
             # step 3: loop difference array to parse details.
             details = self.get_page_details_from_url(info["url"])
             if details is None:
+                v2log.warning("query house %s details failed."%info["hsid"])
                 continue
 
-            v2log.info("update house id=%s, details=%s" % (info["hsid"], query_ret))
+            v2log.info("update house id=%s, details=%s" % (info["hsid"], details))
             # step 4: save details to db.
             self.db.add_house_details(info["hsid"], details["date"], details["area"])
             info["date"] = details["date"]
@@ -151,6 +156,34 @@ class CrawlerHouse(object):
         # step 5: callback
         if on_new is not None:
             on_new(diff_list)
+
+        self.db.close()
+
+    # logic process
+    def moving_to_fix_db(self):
+        self.init_db()
+        diff_list = []
+
+        home_list = self.db.query_all_house_info_hole()
+
+        if home_list is None:
+            v2log.error("query database hole failed.")
+            return
+
+        v2log.info("start to fix: %d data."%len(home_list))
+        for info in home_list:
+            # step 3: loop difference array to parse details.
+            details = self.get_page_details_from_url(info["url"])
+            if details is None:
+                v2log.warning("query house %s details failed."%info["hsid"])
+                continue
+
+            v2log.info("fix house id=%s, details=%s" % (info["hsid"], details))
+            # step 4: save details to db.
+            self.db.add_house_details(info["hsid"], details["date"], details["area"])
+            info["date"] = details["date"]
+            info["area"] = details["area"]
+            time.sleep(2)
 
         self.db.close()
 
@@ -201,10 +234,13 @@ class CrawlerHouse(object):
         if response is None:
             return None
         date = re.findall(u"(?:<span>上市时间</span>:)([0-9]{4}-[0-9]{2}-[0-9]{2})(?:</span>)", response.text)
+
         if len(date) == 0:
+            v2log.warn("parse time failed.")
             return None
 
-        area = re.findall(u"(?:<span>\):)([0-9\.]+)(?:</span>)", response.text)
+        area = re.findall(u"(?:<span>\):?)([0-9\.]+)(?:</span>)", response.text)
         if len(area) == 0:
+            v2log.warn("parse area failed.")
             return None
         return {"date":date[0], "area":area[0]}

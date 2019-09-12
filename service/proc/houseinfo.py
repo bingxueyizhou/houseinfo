@@ -47,6 +47,7 @@ class HouseInfoService:
     def crawler_cd_house_data(self):
         v2log.info("[" + time.asctime() + "] 首页刷新中")
         self.__cd_crawler.moving(HouseInfoService.on_find_new)
+        self.__cd_crawler.moving_to_fix_db()
         return
 
 

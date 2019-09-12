@@ -46,6 +46,14 @@ class HouseInfoDB:
     # 查询所有
     SQL_QUERY_ALL_HOUSE_INFO = "select * from HOUSE_INFO left outer join HOUSE_DETAILS "\
                                 "on HOUSE_INFO.HSID = HOUSE_DETAILS.HSID;"
+    SQL_QUERY_ALL_HOUSE_INFO_HOLE = "select * from (" \
+                                        "select " \
+                                        "HOUSE_INFO.HSID as HSID, " \
+                                        "NAME, URL, " \
+                                        "HOUSE_DETAILS.HSID as E_HSID " \
+                                        "from HOUSE_INFO left outer join HOUSE_DETAILS " \
+                                            "on HOUSE_INFO.HSID = HOUSE_DETAILS.HSID" \
+                                    ")  where E_HSID is null"
 
     # inner functions
     def __init__(self, path=None):
@@ -79,7 +87,7 @@ class HouseInfoDB:
         if not os.path.exists(basedir):
             os.makedirs(basedir)
 
-        if os.path.exists(self.HOUSE_INFO_DB_PATH):
+        if not os.path.exists(self.HOUSE_INFO_DB_PATH):
             self.__touch(self.HOUSE_INFO_DB_PATH)
 
     def __create_db_table_if_not_exist(self, table_name, create_sql):
@@ -202,6 +210,27 @@ class HouseInfoDB:
                 cell['marketing'] = row[11]
                 cell['url'] = row[6]
                 cell['in_time'] = row[7]
+                result.append(cell)
+            return result
+        except BaseException as e:
+            v2log.warn("sql: %s, except:%s"%(sql, e))
+
+        return None
+
+    def query_all_house_info_hole(self):
+        if self.__conn is None:
+            v2log.error("database is unavailable.")
+            return self.DB_ERROR
+
+        sql = self.SQL_QUERY_ALL_HOUSE_INFO_HOLE
+        try:
+            sql_res = self.__conn.execute(sql)
+            result = []
+            for row in sql_res:
+                cell = dict()
+                cell['hsid'] = row[0]
+                cell['name'] = row[1]
+                cell['url'] = row[2]
                 result.append(cell)
             return result
         except BaseException as e:
