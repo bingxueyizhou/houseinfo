@@ -131,6 +131,7 @@ class CrawlerHouse(object):
                 continue
 
             # step 2: if not, add it. And keep different data in array .
+            v2log.info("new house info: id=%s, title=%s" % (info["hsid"], info["title"]))
             self.db.add_house_info(info["hsid"], info["title"], info["zone"], info["name"], info["extra"], info["url"])
             diff_list.append(info)
 
@@ -143,6 +144,8 @@ class CrawlerHouse(object):
             v2log.info("update house id=%s, details=%s" % (info["hsid"], query_ret))
             # step 4: save details to db.
             self.db.add_house_details(info["hsid"], details["date"], details["area"])
+            info["date"] = details["date"]
+            info["area"] = details["area"]
             time.sleep(2)
 
         # step 5: callback

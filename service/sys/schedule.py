@@ -1,91 +1,73 @@
 import time
 import threading
 
-class ScheduleTask(object):
-    MODE_TIMES  = 1
-    MODE_SINGLE = 2
-    MODE_LOOP   = 3
 
-    def __init__(self, now=0, name="", mode=MODE_LOOP, times=0, interval=1, pridata=None, callback=None):
-        self.name     = name
-        self.interval = interval
-        self.pridata  = pridata
+class ScheduleTask(object):
+    MODE_TIMES = 1
+    MODE_SINGLE = 2
+    MODE_LOOP = 3
+
+    def __init__(self, private=None, callback=None):
+        self.private = private
         self.callback = callback
-        self.mode       = mode
-        self.times      = times
-        self.createTime = now
-        self.lastCall   = now
 
 
 class Schedule(object):
-    # old code start
-    TICK = 1000
-    MAX_TICK = 520131452013145201314
-    SCHEDULE_SLEEP = float(TICK)/1000
+    __trigger_cxt = threading.Semaphore(0)
+    __queue_lock = threading.Semaphore(1)
+    __initialized = False
+    __task_list = []
 
-    def __init__(self, tik=TICK):
-        self.tik = tik
-        self.tasklist = []
-        self.current_tick = 0
-        self.schedule_start = self.get_msec()
+    def __init__(self):
+        self.start()
 
-    def register(self, pridata=None, callback=None, name="",
-                 interval=1, mode=ScheduleTask.MODE_LOOP, times=0):
-        self.tasklist.append(
-                    ScheduleTask(
-                        self.get_tick()-interval, name, mode, times,
-                        interval, pridata, callback))
-
-    def get_msec(self):
-        return int(round(time.time() * 1000))
-
-    def get_tick(self):
-        return self.current_tick
-
-    def reset_all_task(self):
-        self.current_tick -= Schedule.MAX_TICK
-        for task in self.tasklist:
-            task.lastCall -= Schedule.MAX_TICK
-
-    def loop(self):
+    def __loop(self):
+        print("schedule start.")
         while True:
-            now = self.get_tick()
-            for task in self.tasklist:
-                if (task.lastCall + task.interval) <= now:
-                    task.callback(task.pridata)
-                    task.lastCall = now
-                    if task.mode == ScheduleTask.MODE_TIMES:
-                        task.times = task.times - 1
-                    if task.mode == ScheduleTask.MODE_SINGLE:
-                        self.tasklist.remove(task)
-                    if task.mode == ScheduleTask.MODE_TIMES and task.times <= 0:
-                        self.tasklist.remove(task)
-            time.sleep(Schedule.SCHEDULE_SLEEP)
-            self.current_tick = self.get_tick() + 1
-            if self.get_tick() > Schedule.MAX_TICK:
-                self.reset_all_task()
+            self.__trigger_cxt.acquire()
+            
+            self.__queue_lock.acquire()
+            for task in self.__task_list:
+                task.callback(task.private)
+            self.__task_list = []
+            self.__queue_lock.release()
 
     def start(self):
-        # self.loop()
+        if not self.__initialized:
+            t = threading.Thread(target=self.__loop)
+            t.start()
+            self.__initialized = True
         return
-    # old code end
 
+
+    def trigger(self):
+        self.__trigger_cxt.release()
+    
+    
+    def register(self, pridata=None, callback=None):
+        self.__queue_lock.acquire()
+        self.__task_list.append(ScheduleTask(pridata, callback))
+        self.__queue_lock.release()
+    
     def do(self, pri_data=None, cb=None, name="",
            interval=1, mode=ScheduleTask.MODE_LOOP, times=0):
         if mode == ScheduleTask.MODE_SINGLE:
-            timer = threading.Timer(interval, (lambda: cb(pri_data)))
+            self.register(pri_data, cb)
+            timer = threading.Timer(interval, (lambda: self.trigger()))
             timer.start()
         elif mode == ScheduleTask.MODE_LOOP:
-            cb(pri_data)
+            self.register(pri_data, cb)
+            self.trigger()
             timer = threading.Timer(interval, lambda: self.do(pri_data=pri_data, cb=cb, name=name, interval=interval, mode=ScheduleTask.MODE_LOOP))
             timer.start()
         elif mode == ScheduleTask.MODE_TIMES:
             if times <= 0:
                 return
-            cb(pri_data)
+            self.register(pri_data, cb)
+            self.trigger()
             timer = threading.Timer(interval, lambda: self.do(pri_data=pri_data, cb=cb, name=name, interval=interval, mode=ScheduleTask.MODE_TIMES, times=(times-1)))
             timer.start()
-
+            
 # debug
 if __name__ == '__main__':
     # name = "",        当前任务的名字
@@ -95,5 +77,5 @@ if __name__ == '__main__':
     # pri_data = None,  私有数据每次都会自带
     # cb = None, 回调函数
     schedule = Schedule()
-    schedule.do(pri_data="Crawler", cb=(lambda x: print("debug")),
+    schedule.do(pri_data="Crawler", cb=(lambda x: print("debug %s"%(time.time())) ),
                 name="Crawler", interval=1, mode=ScheduleTask.MODE_TIMES, times=4)
