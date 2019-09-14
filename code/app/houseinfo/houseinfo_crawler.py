@@ -233,13 +233,16 @@ class CrawlerHouse(object):
         response = self.request_web(url)
         if response is None:
             return None
-        date = re.findall(u"(?:<span>上市时间</span>:)([0-9]{4}-[0-9]{2}-[0-9]{2})(?:</span>)", response.text)
+
+        date = re.findall(u"(?:<span>上市时间</span>:)([0-9]{4}-[0-9]{1,2}-[0-9]{1,2})(?:</span>)", response.text)
 
         if len(date) == 0:
             v2log.warn("parse time failed.")
             return None
 
-        area = re.findall(u"(?:<span>\):?)([0-9\.]+)(?:</span>)", response.text)
+        remove_css = re.compile("style=\".*?\"").sub("", response.text)
+        area = re.findall(u"(?:<span>\)[.\s\S]*?)([0-9\.]+)(?:[.\s\S]*?</span>)", remove_css)
+        print(area)
         if len(area) == 0:
             v2log.warn("parse area failed.")
             return None
