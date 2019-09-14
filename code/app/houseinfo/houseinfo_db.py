@@ -202,12 +202,12 @@ class HouseInfoDB:
                 cell = dict()
                 cell['id'] = row[0]
                 cell['hsid'] = row[1]
-                cell['title'] = row[2]
-                cell['zone'] = row[3]
                 cell['name'] = row[4]
-                cell['extra'] = row[5]
+                cell['zone'] = row[3]
                 cell['area'] = row[10]
                 cell['marketing'] = row[11]
+                cell['extra'] = row[5]
+                cell['title'] = row[2]
                 cell['url'] = row[6]
                 cell['in_time'] = row[7]
                 result.append(cell)

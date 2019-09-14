@@ -1,41 +1,42 @@
 # -*- coding:utf-8 -*-
 import sys
+import copy
 
-## app
-import code.app.v2frame.app_project as app_v2frame
-import code.app.houseinfo.app_project as app_houseinfo
-
-
-def app_init():
-    app_v2frame.app_init()
-    sys_path = app_v2frame.get_app_path()
-    app_houseinfo.app_init(sys_path + "/houseinfo")
+from code.app.v2frame.v2tool import *
 
 
-app_init()
+def handle_help_cmd(cmd=None):
+    if cmd is None:
+        print("all cmd are as follow:")
+        for c in cmd_array:
+            print("\t%s"%(c.get_cmd()))
 
-# tools modules
-# tools functions
-# module handle what
-from code.app.houseinfo.houseinfo_db import HouseInfoDB
-
-
-def houseinfo_show_db():
-    db = HouseInfoDB(app_houseinfo.get_app_data_path())
-    ret = db.query_all_house_info()
-    for cell in ret:
-        print(cell)
-
-
-def handle_one_cmd(cmd):
-    if cmd == "houseinfo_show_db":
-        houseinfo_show_db()
+        print("\ntype : \"help [cmd]\" to show details")
+    else:
+        for c in cmd_array:
+            if cmd == c.get_cmd():
+                c.show_help()
+                return
+        handle_help_cmd()
 
 
 def main():
-    if len(sys.argv) == 2:
-        handle_one_cmd(sys.argv[1])
+    if len(sys.argv) < 2:
+        handle_help_cmd()
+        return 0
+
+    cmd_argv = copy.deepcopy(sys.argv)
+    cmd_argv.pop(0)
+    cmd = cmd_argv.pop(0)
+    if cmd == "help":
+        if len(cmd_argv) == 0:
+            handle_help_cmd()
+        else:
+            handle_help_cmd(cmd_argv[0])
+    elif handle_tool_cmd(cmd, cmd_argv) is False:
+        handle_help_cmd(cmd)
+        return 0
 
 
 if __name__ == '__main__':
-    main()
+    exit(main())
