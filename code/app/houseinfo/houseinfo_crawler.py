@@ -193,7 +193,7 @@ class CrawlerHouse(object):
             print("id is None")
             return
 
-        self.home = HOUSE_URL + "?&p=%s" % (id)
+        self.home = HOUSE_URL + "?&p=%d" % (id)
         print("start parse url:%s"%self.home)
         self.moving()
 
