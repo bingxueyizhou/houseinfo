@@ -4,6 +4,7 @@ import random
 
 import code.app.ip_scout.app_project as app_project
 from code.app.ip_scout.ip_aim import IPAim
+from code.app.ip_scout.ip_db import IPDB
 
 
 ## some ip function
@@ -46,6 +47,7 @@ def get_ipcn_ip(url):
 class Scout:
     IP_SCOUT_HOME = os.path.dirname( os.path.realpath(__file__) )
     __ip_aim = None
+    __ip_db = None
     IP_LIST = []
 
     def __init__(self, path=None):
@@ -55,6 +57,8 @@ class Scout:
 
         global v2log
         v2log = app_project.get_logger()
+
+        self.__ip_db = IPDB(self.IP_SCOUT_HOME+"/user_data")
 
         ## ip list must init after app_init
         self.IP_LIST = [
@@ -72,6 +76,27 @@ class Scout:
         if len(test) <= 0: return False
         return True
 
+    def __ip_handle_tail(self, cb=None, ret_list=[]):
+        if cb is not None:
+            if len(ret_list) == 0:
+                cb(ret_list)
+                return
+
+            # get first cell in list
+            ip_in_process = ret_list[0]
+
+            # get first cell in db
+            ip_in_db = self.__ip_db.query_last_record()
+            if (ip_in_db is not None) and (ip_in_db['ip'] == ip_in_process):
+                v2log.info("ip %s never change."%(ip_in_process))
+                cb([])
+                return
+
+            self.__ip_db.add_ip_record(ip_in_process)
+            cb(ret_list)
+        return
+
+
     # ["ip"]
     def handle(self, callback=None, rand=False):
         ret_list = []
@@ -85,8 +110,7 @@ class Scout:
             else:
                 v2log.warning("parse %s fail."%(ado.get_url()))
 
-            if callback is not None:
-                callback(ret_list)
+            self.__ip_handle_tail(callback, ret_list)
             return
 
         for ado in self.IP_LIST:
@@ -97,5 +121,4 @@ class Scout:
             else:
                 v2log.warning("parse %s fail."%(ado.get_url()))
 
-        if callback is not None:
-            callback(ret_list)
+        self.__ip_handle_tail(callback, ret_list)

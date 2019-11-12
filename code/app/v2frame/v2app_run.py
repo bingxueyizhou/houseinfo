@@ -36,7 +36,7 @@ from code.app.v2frame.service.ip_scout import run as run_ip_scout
 def app_main_run():
     schedule = Schedule()
     schedule.do(pri_data="HouseInfo", cb=run_houseinfo, name="HouseInfo", interval=3600)
-    schedule.do(pri_data="ip_scout", cb=run_ip_scout, name="ip_scout", interval=3600*24)
+    schedule.do(pri_data="ip_scout", cb=run_ip_scout, name="ip_scout", interval=3600*23)
     # more service ...
 
     return
